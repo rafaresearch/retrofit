@@ -1,8 +1,27 @@
+
+sudo: required
 language: java
 
-branches:
-  except:
-    - gh-pages
+jdk:
+  - openjdk8
 
-notifications:
-  email: false
+script:
+  - mvn package -DskipTests
+
+before_deploy:
+    - mkdir MiningBuild
+    - find . -name '*.jar' -exec cp {} ./MiningBuild \;
+    - cd /home/travis/build/rafaresearch/retrofit/MiningBuild
+    - tar -zcvf result.tar.gz *
+deploy:
+  provider: releases
+  api_key:
+    secure: $GITHUB_TOKEN
+  file: result.tar.gz
+  name: fetchjar-71f622ce51031b152a0be6ad5facfb27a654bf5a
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    all_branches: true 
+            
